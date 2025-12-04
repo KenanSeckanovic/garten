@@ -1,0 +1,79 @@
+@startuml KundeHandler
+
+skinparam classAttributeIconSize 0
+
+package jakarta.servlet.http {
+    class HttpServletRequest
+}
+
+package org.springframework {
+    package web.bind.annotation {
+        interface "@RestController" as RestController
+        interface "@RequestMapping" as RequestMapping
+        interface "@PathVariable" as PathVariable
+        interface "@RequestParam" as RequestParam
+        interface "@ExceptionHandler" as ExceptionHandler
+
+        RequestMapping .left[hidden].> RestController
+    }
+
+    package http {
+        class ResponseEntity<T>
+    }
+    package util {
+        class MultiValueMap<K,V>
+    }
+}
+
+package java.util {
+    class UUID
+
+    UUID .up[hidden].> HttpServletRequest
+}
+
+package com.acme.garten {
+    package entity {
+        class Garten << entity >>
+    }
+
+    package service {
+        class GartenReadService << control >> << @Service >>
+        class NotFoundException
+
+        GartenReadService .right[hidden].> NotFoundException
+    }
+
+    package rest #DDDDDD {
+        class GartenGetController << boundary >> << @RestController >> << @RequestMapping >> {
+            + @GetMapping getById(@PathVariable id: UUID)
+            + @GetMapping get(@RequestParam queryParams: MultiValueMap<String, String>, request: HttpServletRequest)
+        }
+
+        class CommonExceptionHandler << @ControllerAdvice >> {
+            + @ExceptionHandler @ResponseStatus onNotFound(ex: NotFoundException)
+        }
+
+        GartenGetController o-right-> "1" GartenReadService : service
+        GartenGetController ..> Garten
+
+        GartenGetController .right.> HttpServletRequest
+        GartenGetController .up.> MultiValueMap
+        GartenGetController .up.> ResponseEntity
+
+        GartenGetController .up.> RestController
+        GartenGetController .up.> RequestMapping
+        GartenGetController .up.> PathVariable
+        GartenGetController .up.> RequestParam
+
+        CommonExceptionHandler .up.> ExceptionHandler
+        CommonExceptionHandler .up.> ResponseStatus
+        CommonExceptionHandler ..> NotFoundException
+        CommonExceptionHandler .[hidden].> Garten
+
+        GartenGetController .right.> UUID
+    }
+}
+
+hide empty members
+
+@enduml

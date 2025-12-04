@@ -1,0 +1,89 @@
+@startuml KundeHandler
+
+skinparam classAttributeIconSize 0
+
+package jakarta.servlet.http {
+    class HttpServletRequest
+}
+
+package org.springframework {
+    package stereotype {
+        interface "@Controller" as Controller
+    }
+
+    package web.bind.annotation {
+        interface "@RequestMapping" as RequestMapping
+        interface "@PathVariable" as PathVariable
+        interface "@RequestBody" as RequestBody
+        interface "@ExceptionHandler" as ExceptionHandler
+
+        RequestBody .left[hidden].> Controller
+        ExceptionHandler .left[hidden].> Controller
+    }
+
+    package http {
+        class ResponseEntity<T>
+        class ProblemDetail
+
+        package converter {
+            class HttpMessageNotReadableException
+        }
+
+        ResponseEntity .[hidden].> ProblemDetail
+        ResponseEntity .left[hidden].> Controller
+        ProblemDetail .[hidden].> HttpMessageNotReadableException
+    }
+}
+
+package java.util {
+    interface Collection<T>
+    class UUID
+    class Optional<T>
+
+    Collection .[hidden].> Optional
+    Optional .[hidden].> UUID
+    HttpServletRequest .up[hidden].> UUID
+}
+
+package com.acme.Garten {
+    package service {
+        class GartenWriteService << control >> << @Service >>
+        class ConstraintViolationsException
+    }
+
+    package rest #DDDDDD {
+        class GartenDTO <<entity>>
+        GartenDTO .[hidden].> UUID
+        GartenDTO .[hidden].> GartenWriteService
+
+        class GartenWriteController << boundary >> << @Controller >> << @RequestMapping >> {
+            + @PostMapping post(@RequestBody gartenDTO: GartenDTO, request: HttpServletRequest): ResponseEntity<ProblemDetail>
+            + @PutMapping put(@PathVariable id: UUID, @RequestBody gartenDTO: GartenDTO, @RequestHeader("If-Match") version: Optional<String>, request: HttpServletRequest): ResponseEntity<Void>
+            + @DeleteMapping deleteById(@PathVariable id: UUID)
+            + @ExceptionHandler onConstraintViolations(ex: ConstraintViolationsException, req: HttpServletRequest): ResponseEntity<ProblemDetail>
+            + @ExceptionHandler onMessageNotReadable(ex: HttpMessageNotReadableException, req: HttpServletRequest): ResponseEntity<ProblemDetail>
+        }
+
+        GartenWriteController o-right-> "1" GartenWriteService
+        GartenWriteController ..> GartenDTO
+        GartenWriteController .up.> UUID
+        GartenWriteController .up.> Optional
+        GartenWriteController .up.> Collection
+        GartenWriteController ..> ConstraintViolationsException
+        GartenWriteController .up.> HttpMessageNotReadableException
+
+        GartenWriteController .up.> HttpServletRequest
+        GartenWriteController .up.> ResponseEntity
+        GartenWriteController .up.> ProblemDetail
+
+        GartenWriteController .up.> Controller
+        GartenWriteController .up.> RequestMapping
+        GartenWriteController .up.> PathVariable
+        GartenWriteController .up.> RequestBody
+        GartenWriteController .up.> ExceptionHandler
+    }
+}
+
+hide empty members
+
+@enduml

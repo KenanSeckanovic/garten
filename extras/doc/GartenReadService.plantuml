@@ -1,0 +1,46 @@
+@startuml GartenService
+
+skinparam classAttributeIconSize 0
+
+package java.util {
+    interface List<T>
+    interface Map<K, V>
+    class UUID
+}
+
+package org.springframework {
+    package stereotype {
+        interface Service
+    }
+}
+
+package com.acme.garten {
+    package entity {
+        class Garten << entity >>
+
+        Garten .up[hidden].> UUID
+        Garten .up[hidden].> Service
+    }
+
+    package repository {
+        interface GartenRepository << control >>
+    }
+
+    package service #DDDDDD {
+        class GartenReadService << control >> << @Service >> {
+            + findById(id: UUID): Garten
+            + find(suchkriterien: Map<String, List<String>>): List<Garten>
+        }
+
+        GartenReadService o--> "1" GartenRepository : repo
+        GartenReadService .up.> Garten
+        GartenReadService .up.> UUID
+        GartenReadService .up.> List
+        GartenReadService .up.> Map
+        GartenReadService .up.> Service
+    }
+}
+
+hide empty members
+
+@enduml

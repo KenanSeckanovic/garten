@@ -1,0 +1,28 @@
+@startuml Er Diagramm
+
+hide circle
+skinparam linetype ortho
+
+entity "Garten" {
+  * id : UUID <<generated>>
+  --
+  * name : String
+}
+
+entity "Baum" {
+  * id : UUID <<generated>>
+  --
+  * aeste : int
+}
+
+entity "Ort" {
+  * id : UUID <<generated>>
+  --
+  * name : String
+}
+
+Garten ||--o{ Baum : besitzt
+Garten ||--|| Ort : liegt in
+
+
+@enduml

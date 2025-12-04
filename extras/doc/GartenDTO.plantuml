@@ -1,0 +1,32 @@
+@startuml GartenUserModel
+
+skinparam classAttributeIconSize 0
+' skinparam monochrome true
+
+package java {
+    package util {
+        interface List<T>
+    }
+}
+
+package com.acme.garten {
+    package entity {
+        class Baum
+        class Ort
+    }
+
+    package rest #DDDDDD {
+        class GartenDTO << entity >> {
+            readonly name : String
+            readonly flaeche: int
+        }
+
+        GartenDTO *--> "*" Baum : baum
+        GartenDTO *--> "1" Ort : ort
+        GartenDTO .right.> List
+    }
+}
+
+hide empty members
+
+@enduml

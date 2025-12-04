@@ -1,0 +1,43 @@
+@startuml GartenWriteService
+
+skinparam classAttributeIconSize 0
+
+package java.util {
+    class UUID
+}
+
+package org.springframework {
+    package stereotype {
+        interface Service
+    }
+}
+
+package com.acme.garten {
+
+    package entity {
+        class Garten << entity >>
+        Garten .up[hidden].> UUID
+    }
+
+    package repository {
+        interface GartenRepository << control >>
+    }
+
+    package service #DDDDDD {
+        class GartenWriteService << control >> << @Service >> {
+            + create(garten: Garten): Garten
+            + update(garten: Garten, id: UUID): Garten
+            + deleteById(id: UUID)
+        }
+
+        GartenWriteService o--> "1" GartenRepository : repo
+
+        GartenWriteService .right.> Garten
+        GartenWriteService .up.> UUID
+        GartenWriteService .up.> Service
+    }
+}
+
+hide empty members
+
+@enduml

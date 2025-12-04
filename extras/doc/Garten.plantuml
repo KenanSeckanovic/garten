@@ -1,0 +1,48 @@
+@startuml Garten
+
+skinparam classAttributeIconSize 0
+' skinparam monochrome true
+
+package java {
+    package util {
+        class UUID
+        class Objects
+        interface List<T>
+    }
+}
+
+package com.acme.garten {
+    package entity #DDDDDD {
+        class Baum << entity >> {
+            id : UUID
+            name: String
+            aeste: int
+        }
+        Baum ..> UUID
+
+        class Ort << entity >> {
+            plz: String
+            name: String
+        }
+
+        class Garten << entity >> {
+            id : UUID
+            name: String
+            flaeche: int
+            ort: Ort
+            baum List<Baum>
+        }
+
+        Garten *--> "0..*" Baum : @OneToOne(cascade = [...]) \n@JoinColumn(...) \nbaeume
+        Garten *--> "1" Ort : @OneToOne(cascade = [...]) \nort
+
+        Garten .right.> UUID
+        Garten .right.> Objects
+        Garten .right.> List
+
+    }
+}
+
+hide empty members
+
+@enduml
